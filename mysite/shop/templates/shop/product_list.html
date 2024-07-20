@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Список продуктов{% endblock %}
+
+{% block content %}
+<h1>Список продуктов</h1>
+<ul>
+    {% for product in products %}
+    <li>
+        <h2>{{ product.name }}</h2>
+        <p>{{ product.description }}</p>
+        {% if product.current_version %}
+        <p>Текущая версия: {{ product.current_version.version_name }} ({{ product.current_version.version_number }})</p>
+        {% else %}
+        <p>Нет активной версии</p>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

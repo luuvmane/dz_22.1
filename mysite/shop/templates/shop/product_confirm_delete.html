@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirm Delete{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Подтверждение удаления</h1>
+    <form method="post">
+        {% csrf_token %}
+        <p> Вы уверенны что хотите удалить? "{{ object.name }}"?</p>
+        <button type="submit" class="btn btn-danger">Да</button>
+        <a href="{% url 'product_list' %}" class="btn btn-secondary">Нет</a>
+    </form>
+</div>
+{% endblock %}
