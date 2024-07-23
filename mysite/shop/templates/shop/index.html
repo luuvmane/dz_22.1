@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Список товаров{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Список товаров</h1>
+    <a href="{% url 'product_create' %}" class="btn btn-primary mb-3">Создать новый продукт</a>
+    <div class="row">
+        {% for product in products %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                {% else %}
+                <img src="{% static 'default_image.jpg' %}" class="card-img-top" alt="Изображение по умолчанию">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text">{{ product.description|truncatechars:100 }}</p>
+                    <p class="card-text"><strong>Цена:</strong> ${{ product.price }}</p>
+                    {% if product_versions.product.pk %}
+                    <p class="card-text"><strong>Активная версия:</strong> {{ product_versions.product.pk.version_name }} ({{ product_versions.product.pk.version_number }})</p>
+                    {% else %}
+                    <p class="card-text"><strong>Активная версия:</strong> Нет</p>
+                    {% endif %}
+                    <a href="{% url 'product-detail' product.pk %}" class="btn btn-info">Посмотреть</a>
+                    <a href="{% url 'product_edit' product.pk %}" class="btn btn-warning">Редактировать</a>
+                    <a href="{% url 'product_delete' product.pk %}" class="btn btn-danger" onclick="return confirm('Вы уверены, что хотите удалить этот продукт?');">Удалить</a>
+                    <a href="{% url 'version-create' product.id %}" class="btn btn-primary">Добавить версию</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p>Нет доступных товаров.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

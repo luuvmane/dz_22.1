@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Product Detail - {{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+            {% else %}
+            <img src="{% static 'default_image.jpg' %}" class="card-img-top" alt="Default Image">
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">{{ product.name }}</h5>
+                <p class="card-text">{{ product.description }}</p>
+                <p class="card-text"><strong>Price:</strong> ${{ product.price }}</p>
+                <p class="card-text"><strong>Active Version:</strong>
+                    {% if product.active_version %}
+                        {{ product.active_version.version_name }} ({{ product.active_version.version_number }})
+                    {% else %}
+                        None
+                    {% endif %}
+                </p>
+                <a href="{% url 'product_edit' product.pk %}" class="btn btn-warning">Edit</a>
+                <a href="{% url 'product_delete' product.pk %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this product?');">Delete</a>
+                <a href="{% url 'version-create' product.pk %}" class="btn btn-primary">Add Version</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
