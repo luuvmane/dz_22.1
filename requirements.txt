@@ -1,2 +1,0 @@
-Django~=5.0.7
-django-crispy-forms~=2.3
