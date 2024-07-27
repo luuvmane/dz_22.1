@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Список блог постов{% endblock %}
+
+{% block content %}
+<h1>Список блог постов</h1>
+<a href="{% url 'blogpost_create' %}" class="btn btn-primary mb-3">Создать новый блог пост</a>
+{% if blog_posts %}
+<ul class="list-unstyled">
+    {% for blog_post in blog_posts %}
+    <li class="mb-4">
+        <h2>{{ blog_post.title }}</h2>
+        {% if blog_post.preview_image %}
+        <img src="{{ blog_post.preview_image.url }}" alt="{{ blog_post.title }}" class="img-fluid mb-2" style="max-width: 300px;">
+        {% endif %}
+        <p>{{ blog_post.content|slice:":100" }}...</p>
+        <p>Дата создания: {{ blog_post.created_at }}</p>
+        <p>Просмотров: {{ blog_post.views }}</p>
+        <p>Статус: {% if blog_post.published %}Опубликован{% else %}Не опубликован{% endif %}</p>
+        <a href="{% url 'blogpost_detail' blog_post.id %}" class="btn btn-primary">Читать больше</a>
+        <a href="{% url 'blogpost_update' blog_post.id %}" class="btn btn-secondary">Редактировать</a>
+        <a href="{% url 'blogpost_delete' blog_post.id %}" class="btn btn-danger">Удалить</a>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>Нет доступных блог постов.</p>
+{% endif %}
+{% endblock %}

@@ -6,6 +6,10 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.urls import reverse
+from .models import BlogPost
+from django.db.models import F
+from django.utils.text import slugify
+import uuid
 
 
 def product_detail(request, pk):
@@ -91,3 +95,52 @@ class VersionUpdateView(UpdateView):
 class VersionDetailView(DetailView):
     model = Version
     template_name = 'shop/version_detail.html'
+
+
+class BlogPostListView(ListView):
+    model = BlogPost
+    template_name = 'blog/blogpost_list.html'
+    context_object_name = 'blog_posts'
+
+    def get_queryset(self):
+        return BlogPost.objects.filter(published=True)
+
+
+class BlogPostDetailView(DetailView):
+    model = BlogPost
+    template_name = 'blog/blogpost_detail.html'
+    context_object_name = 'post'
+
+    def get_object(self, queryset=None):
+        post = super().get_object(queryset=queryset)
+        post.views += 1
+        post.save(update_fields=['views'])
+        return post
+
+
+class BlogPostCreateView(CreateView):
+    model = BlogPost
+    template_name = 'blog/blogpost_form.html'
+    fields = ['title', 'content', 'preview_image', 'published']
+    success_url = reverse_lazy('blogpost_list')
+
+    def form_valid(self, form):
+        form.instance.slug = slugify(form.instance.title)
+        if BlogPost.objects.filter(slug=form.instance.slug).exists():
+            form.instance.slug += f"-{uuid.uuid4().hex[:5]}"
+        return super().form_valid(form)
+
+
+class BlogPostUpdateView(UpdateView):
+    model = BlogPost
+    template_name = 'blog/blogpost_form.html'
+    fields = ['title', 'content', 'preview_image', 'published']
+
+    def get_success_url(self):
+        return reverse('blogpost_detail', args=[self.object.slug])
+
+
+class BlogPostDeleteView(DeleteView):
+    model = BlogPost
+    template_name = 'blog/blogpost_confirm_delete.html'
+    success_url = reverse_lazy('blogpost_list')
