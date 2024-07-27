@@ -10,12 +10,15 @@
     <li>
         <h2>{{ product.name }}</h2>
         <p>{{ product.description }}</p>
+        <p><strong>Категория:</strong> {{ product.category.name }}</p>
         {% if product.current_version %}
         <p>Текущая версия: {{ product.current_version.version_name }} ({{ product.current_version.version_number }})</p>
         {% else %}
         <p>Нет активной версии</p>
         {% endif %}
     </li>
+    {% empty %}
+    <li>Нет продуктов для отображения.</li>
     {% endfor %}
 </ul>
 {% endblock %}

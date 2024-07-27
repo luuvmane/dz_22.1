@@ -1,7 +1,11 @@
 from django.contrib import admin
-from .models import Product, BlogPost
+from .models import Product, BlogPost, Category
 
-admin.site.register(Product)
+
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ('name', 'category', 'price', 'views')
+    search_fields = ('name', 'category__name')
 
 
 @admin.register(BlogPost)
@@ -10,3 +14,9 @@ class BlogPostAdmin(admin.ModelAdmin):
     search_fields = ('title', 'content')
     list_filter = ('created_at', 'published')
     prepopulated_fields = {'slug': ('title',)}
+
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)

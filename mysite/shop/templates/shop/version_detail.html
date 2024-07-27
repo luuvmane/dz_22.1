@@ -6,8 +6,8 @@
 {% block content %}
 <div class="container mt-4">
     <h1>{{ version.version_name }}</h1>
-    <p><strong>Product:</strong> {{ version.product.name }}</p>
-    <p><strong>Version Number:</strong> {{ version.version_number }}</p>
+    <p><strong>Продукт:</strong> {{ version.product.name }}</p>
+    <p><strong>Номер версии:</strong> {{ version.version_number }}</p>
     <p><strong>Is Active:</strong> {{ version.is_active }}</p>
     <a href="{% url 'version_edit' version.pk %}" class="btn btn-warning">Edit</a>
 </div>

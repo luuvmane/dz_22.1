@@ -1,5 +1,5 @@
 from django import forms
-from .models import Product, Version
+from .models import Product, Version, Category
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 
@@ -13,7 +13,7 @@ FORBIDDEN_WORDS = [
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['name', 'description', 'price', 'image']
+        fields = ['name', 'description', 'price', 'image', 'category']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

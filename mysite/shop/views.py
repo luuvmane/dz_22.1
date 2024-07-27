@@ -1,13 +1,10 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Product, Version
+from .models import Product, Version, BlogPost
 from .forms import ProductForm, VersionForm
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from django.urls import reverse
-from .models import BlogPost
-from django.db.models import F
 from django.utils.text import slugify
 import uuid
 
@@ -34,6 +31,7 @@ class ProductCreateView(CreateView):
 class ProductDetailView(DetailView):
     model = Product
     template_name = 'shop/product_detail.html'
+    context_object_name = 'product'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -58,10 +56,14 @@ class ProductDeleteView(DeleteView):
 class ProductListView(ListView):
     model = Product
     template_name = 'shop/index.html'
+    context_object_name = 'product_list'
+
+    def get_queryset(self):
+        return Product.objects.prefetch_related('versions').all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        products = Product.objects.prefetch_related('versions')
+        products = self.get_queryset()
         for product in products:
             active_version = product.versions.filter(is_active=True).first()
             product.active_version = active_version
