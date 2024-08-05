@@ -7,7 +7,7 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.utils.text import slugify
 import uuid
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 
 def product_detail(request, pk):
@@ -40,17 +40,28 @@ class ProductDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        product = self.get_object()
-        active_version = product.versions.filter(is_active=True).first()
-        context['active_version'] = active_version
+        product = self.object
+        has_change_permission = self.request.user.has_perm('shop.change_product')
+        has_delete_permission = self.request.user.has_perm('shop.delete_product')
+        context['has_change_permission'] = has_change_permission
+        context['has_delete_permission'] = has_delete_permission
+        context['active_version'] = product.versions.filter(is_active=True).first()
         return context
 
 
-class ProductUpdateView(UpdateView):
+class ProductUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Product
-    form_class = ProductForm
     template_name = 'shop/product_form.html'
     success_url = reverse_lazy('product_list')
+    fields = ['name', 'description', 'price', 'category', 'is_published']
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
+    def test_func(self):
+        product = self.get_object()
+        return self.request.user == product.owner
 
 
 class ProductDeleteView(DeleteView):
@@ -92,11 +103,15 @@ class VersionCreateView(CreateView):
         return reverse('product-detail', kwargs={'pk': self.kwargs['product_id']})
 
 
-class VersionUpdateView(UpdateView):
+class VersionUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Version
     form_class = VersionForm
     template_name = 'shop/version_form.html'
     success_url = reverse_lazy('product_list')
+
+    def test_func(self):
+        version = self.get_object()
+        return self.request.user == version.product.owner or self.request.user.has_perm('shop.change_version')
 
 
 class VersionDetailView(DetailView):

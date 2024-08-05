@@ -18,11 +18,23 @@
                     <p class="card-text">{{ product.description }}</p>
                     <p class="card-text"><strong>Цена:</strong> ${{ product.price }}</p>
                     <p class="card-text"><strong>Категория:</strong> {{ product.category.name }}</p>
+
                     {% if active_version %}
                     <p class="card-text"><strong>Активная версия:</strong> {{ active_version.version_name }}</p>
                     <p class="card-text">{{ active_version.description }}</p>
                     {% else %}
                     <p class="card-text"><strong>Активная версия:</strong> None</p>
+                    {% endif %}
+
+                    {% if user == product.owner or has_change_permission %}
+                        <a href="{% url 'product_edit' product.pk %}" class="btn btn-warning">Edit</a>
+                    {% endif %}
+
+                    {% if user == product.owner or has_delete_permission %}
+                        <form action="{% url 'product_delete' product.pk %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
                     {% endif %}
                 </div>
             </div>
