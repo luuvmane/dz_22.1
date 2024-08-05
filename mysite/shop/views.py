@@ -7,6 +7,7 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.utils.text import slugify
 import uuid
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 def product_detail(request, pk):
@@ -26,6 +27,10 @@ class ProductCreateView(CreateView):
     form_class = ProductForm
     template_name = 'shop/product_form.html'
     success_url = reverse_lazy('product_list')
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
 
 
 class ProductDetailView(DetailView):
