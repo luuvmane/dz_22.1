@@ -8,6 +8,7 @@ from django.views.generic.detail import DetailView
 from django.utils.text import slugify
 import uuid
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from .forms import OwnerProductForm, ModeratorProductForm
 
 
 def product_detail(request, pk):
@@ -54,6 +55,16 @@ class ProductUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     template_name = 'shop/product_form.html'
     success_url = reverse_lazy('product_list')
     fields = ['name', 'description', 'price', 'category', 'is_published']
+    permission_required = ('shop.change_product', 'shop.can_moderate')
+
+    def get_form_class(self):
+        product = self.get_object()
+        if self.request.user == product.owner:
+            return OwnerProductForm
+        elif self.request.user.has_perm('shop.can_moderate'):
+            return ModeratorProductForm
+        else:
+            return OwnerProductForm
 
     def form_valid(self, form):
         form.instance.owner = self.request.user

@@ -27,6 +27,12 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     is_published = models.BooleanField(default=False)
 
+    class Meta:
+        permissions = [
+            ("can_publish", "Can publish product"),
+            ("can_moderate", "Can moderate product"),
+        ]
+
     def __str__(self):
         return self.name
 

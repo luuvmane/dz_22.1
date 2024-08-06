@@ -14,6 +14,8 @@ class Command(BaseCommand):
             'change_product',
             'delete_product',
             'view_product',
+            'can_publish',
+            'can_moderate',
         ])
 
         group.permissions.set(permissions)

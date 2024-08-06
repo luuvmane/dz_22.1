@@ -26,16 +26,17 @@
                     <p class="card-text"><strong>Активная версия:</strong> None</p>
                     {% endif %}
 
-                    {% if user == product.owner or has_change_permission %}
+                    {% if user == product.owner or perms.shop.can_moderate %}
                         <a href="{% url 'product_edit' product.pk %}" class="btn btn-warning">Edit</a>
                     {% endif %}
 
-                    {% if user == product.owner or has_delete_permission %}
+                    {% if user == product.owner or perms.shop.delete_product %}
                         <form action="{% url 'product_delete' product.pk %}" method="post" style="display:inline;">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-danger">Delete</button>
                         </form>
                     {% endif %}
+                    <a href="{% url 'product_list' %}" class="btn btn-secondary">Back to Products</a>
                 </div>
             </div>
         </div>
