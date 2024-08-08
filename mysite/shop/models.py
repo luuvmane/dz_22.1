@@ -29,8 +29,9 @@ class Product(models.Model):
 
     class Meta:
         permissions = [
-            ("can_publish", "Can publish product"),
-            ("can_moderate", "Can moderate product"),
+            ("can_unpublish_product", "Can unpublish product"),
+            ("can_edit_description", "Can edit description"),
+            ("can_edit_category", "Can edit category"),
         ]
 
     def __str__(self):

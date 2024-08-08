@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Product, Version, BlogPost
-from .forms import ProductForm, VersionForm
+from .forms import VersionForm
 from django.urls import reverse_lazy, reverse
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
@@ -8,7 +8,8 @@ from django.views.generic.detail import DetailView
 from django.utils.text import slugify
 import uuid
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .forms import OwnerProductForm, ModeratorProductForm
+from .forms import ProductForm, ModeratorProductForm
+from django.core.exceptions import PermissionDenied
 
 
 def product_detail(request, pk):
@@ -54,17 +55,15 @@ class ProductUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Product
     template_name = 'shop/product_form.html'
     success_url = reverse_lazy('product_list')
-    fields = ['name', 'description', 'price', 'category', 'is_published']
-    permission_required = ('shop.change_product', 'shop.can_moderate')
 
     def get_form_class(self):
-        product = self.get_object()
-        if self.request.user == product.owner:
-            return OwnerProductForm
-        elif self.request.user.has_perm('shop.can_moderate'):
+        user = self.request.user
+        if user == self.get_object().owner:
+            return ProductForm
+        elif user.has_perm("shop.can_edit_description") and user.has_perm("shop.can_edit_category"):
             return ModeratorProductForm
         else:
-            return OwnerProductForm
+            raise PermissionDenied
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
@@ -72,7 +71,7 @@ class ProductUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def test_func(self):
         product = self.get_object()
-        return self.request.user == product.owner
+        return self.request.user == product.owner or self.request.user.has_perm("shop.can_edit_description") and self.request.user.has_perm("shop.can_edit_category")
 
 
 class ProductDeleteView(DeleteView):
