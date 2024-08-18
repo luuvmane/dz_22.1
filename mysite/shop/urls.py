@@ -7,6 +7,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from .views import BlogPostListView,ProductListView, BlogPostDetailView, BlogPostCreateView, BlogPostUpdateView, BlogPostDeleteView
 from . import views
+from django.views.decorators.cache import cache_page
+from .views import CategoryListView
 
 urlpatterns = [
     path('', ProductListView.as_view(), name='product_list'),
@@ -25,7 +27,9 @@ urlpatterns = [
     path('post/<int:pk>/delete/', BlogPostDeleteView.as_view(), name='blogpost_delete'),
     path('posts/<int:pk>/edit/', BlogPostUpdateView.as_view(), name='blogpost_update'),
     path('products/', ProductListView.as_view(), name='product_list'),
-    path('version/create/<int:product_id>/', VersionCreateView.as_view(), name='version_create')
+    path('version/create/<int:product_id>/', VersionCreateView.as_view(), name='version_create'),
+    path('product/<int:pk>/', cache_page(60 * 15)(ProductDetailView.as_view()), name='product_detail'),
+    path('categories/', CategoryListView.as_view(), name='category-list'),
 ]
 
 if settings.DEBUG:

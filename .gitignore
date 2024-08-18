@@ -5,7 +5,7 @@ __pycache__/
 .idea/
 .idea
 123
-
+.env
 # Virtual Environments
 venv/
 env/

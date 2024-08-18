@@ -10,6 +10,17 @@ import uuid
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .forms import ProductForm, ModeratorProductForm
 from django.core.exceptions import PermissionDenied
+from .models import Category
+from .services import get_cached_categories
+
+
+class CategoryListView(ListView):
+    model = Category
+    template_name = 'category_list.html'
+    context_object_name = 'categories'
+
+    def get_queryset(self):
+        return get_cached_categories()
 
 
 def product_detail(request, pk):
