@@ -1,17 +1,15 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Product, Version, BlogPost
-from .forms import VersionForm
+from .models import Product, Version, BlogPost, Category
+from .forms import VersionForm, ProductForm, ModeratorProductForm
 from django.urls import reverse_lazy, reverse
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic.list import ListView
-from django.views.generic.detail import DetailView
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
 from django.utils.text import slugify
 import uuid
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .forms import ProductForm, ModeratorProductForm
 from django.core.exceptions import PermissionDenied
-from .models import Category
 from .services import get_cached_categories
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
 
 
 class CategoryListView(ListView):
@@ -23,6 +21,7 @@ class CategoryListView(ListView):
         return get_cached_categories()
 
 
+@cache_page(60 * 60)
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)
     context = {'product': product}
